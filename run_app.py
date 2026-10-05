@@ -35,7 +35,7 @@ if __name__ == "__main__":
     load_dotenv(os.path.join(ROOT_DIR, ".env"))
 
     port = int(os.environ.get("PORT", 8000))
-    host = os.environ.get("HOST", "127.0.0.1")
+    host = os.environ.get("HOST", "0.0.0.0")
 
     print("\n" + "=" * 70)
     print("  >> Lunor AI - Autonomous Mobile App Development Studio")
