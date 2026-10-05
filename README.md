@@ -87,11 +87,13 @@ Deploy frontend and backend separately on modern serverless edge infrastructure:
    - Vercel automatically deploys with zero build steps using `frontend/vercel.json`.
 2. **Backend on Render or Railway**:
    - Deploy `backend/` using `backend/Dockerfile` or `backend/render.yaml`.
-3. **Connect Frontend to Backend**:
-   - Open your live Vercel URL.
-   - Click the **🌐 API: Local** button in the top navigation bar.
-   - Enter your Render backend URL (e.g., `https://lunor-backend.onrender.com`).
-   - Click **Save & Connect**!
+3. **Connect Frontend to Backend via Vercel Environment Variable**:
+   - In your **Vercel Project Dashboard**, go to **Settings** ➔ **Environment Variables**.
+   - Add a new environment variable:
+     - **Key**: `BACKEND_URL`
+     - **Value**: `https://lunor-backend.onrender.com` (your live deployed backend URL)
+   - Save and redeploy. All `/api/*` traffic will automatically and securely proxy to your backend without any manual browser configuration!
+
 
 ---
 

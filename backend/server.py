@@ -417,6 +417,7 @@ routes = [
     Route("/studio.js", endpoint=serve_studio_js),
     Route("/assets/{path:path}", endpoint=serve_direct_assets),
     Route("/api/health", endpoint=api_health, methods=["GET"]),
+    Route("/api/config", endpoint=lambda req: JSONResponse({"backend_url": "", "unified_mode": True}), methods=["GET"]),
     Route("/api/config/groq", endpoint=api_config_groq, methods=["GET", "POST"]),
     Route("/api/agent/run", endpoint=api_agent_run, methods=["POST"]),
     Route("/api/agent/stream", endpoint=api_agent_stream, methods=["GET"]),

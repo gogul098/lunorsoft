@@ -54,10 +54,29 @@ const state = {
   challenges: null
 };
 
+// Automatically detect Vercel environment variable (BACKEND_URL)
+async function detectVercelEnvironment() {
+  if (!state.apiBaseUrl) {
+    try {
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.backend_url) {
+          state.apiBaseUrl = data.backend_url.replace(/\/+$/, '');
+          apiBaseUrl = state.apiBaseUrl;
+        }
+      }
+    } catch (e) {
+      // Running unified locally or offline
+    }
+  }
+}
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   startClock();
+  await detectVercelEnvironment();
   updateApiButtonUI();
   await checkBackendGroqStatus();
   updateKeyButtonUI();
@@ -66,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load existing files from disk workspace
   await loadWorkspaceFromDisk();
 });
+
 
 
 // --- Workspace Disk Synchronization ---

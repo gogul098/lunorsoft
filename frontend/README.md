@@ -52,10 +52,21 @@ npx serve .
 
 ---
 
-## 🔗 Connecting to the Backend
+## 🔗 Connecting to the Backend via Vercel Environment Variable
 
-By default, the studio connects to the same origin (`/api/...`).
-To connect to an external hosted backend (e.g., on Render, Railway, or AWS):
-1. Click the **🌐 API: Local** button in the studio header.
-2. Enter your backend URL (e.g. `https://lunor-backend.onrender.com`).
-3. Click **Save & Connect**. The setting persists in `localStorage`.
+When deploying on Vercel, you connect to your backend using a standard **Environment Variable**:
+
+1. In your **[Vercel Dashboard](https://vercel.com/)**, select your deployed project.
+2. Go to **Settings** ➔ **Environment Variables**.
+3. Add a new variable:
+   * **Key**: `BACKEND_URL`
+   * **Value**: Your live backend URL (e.g., `https://lunor-backend.onrender.com`)
+   * **Environments**: Check *Production*, *Preview*, and *Development*.
+4. Click **Save** and redeploy.
+
+### How it works:
+- [`frontend/vercel.json`](vercel.json) uses the `${BACKEND_URL}` rewrite rule to transparently forward all `/api/*` calls directly to your backend.
+- [`frontend/api/[...path].js`](api/[...path].js) provides an automatic serverless proxy fallback.
+- [`frontend/api/config.js`](api/config.js) dynamically informs the frontend client of the configured backend.
+- No manual browser configuration is required!
+

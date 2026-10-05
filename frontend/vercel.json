@@ -2,26 +2,19 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "source": "/api/config",
+      "destination": "/api/config.js"
     },
     {
-      "src": "/studio.css",
-      "dest": "/studio.css"
+      "source": "/api/(.*)",
+      "destination": "${BACKEND_URL}/api/$1",
+      "env": ["BACKEND_URL"]
     },
     {
-      "src": "/studio.js",
-      "dest": "/studio.js"
-    },
-    {
-      "src": "/studio",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
+      "source": "/studio",
+      "destination": "/index.html"
     }
   ]
 }
