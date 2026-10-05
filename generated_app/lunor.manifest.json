@@ -1,0 +1,108 @@
+{
+  "app_name": "StudentPlanner",
+  "spec": {
+    "app_name": "StudentPlanner",
+    "title": "Student Planner",
+    "prompt_summary": "A simple planner for students to track assignments, due dates, and courses, with quick add and search features.",
+    "target_personas": [
+      "Mobile Users",
+      "Power Users"
+    ],
+    "native_hardware_apis": [
+      "AsyncStorage (Persistence)",
+      "Haptics (Tactile Feedback)"
+    ],
+    "mobile_constraints": [
+      "Safe Area Insets",
+      "Touch target >=44pt",
+      "60fps animations"
+    ],
+    "domain": "mobile"
+  },
+  "nav_graph": {
+    "navigation_type": "Expo Router (File-based Tabs + Modals)",
+    "tabs": [
+      {
+        "name": "_layout",
+        "route": "app/(tabs)/_layout.tsx",
+        "icon": "compass",
+        "description": "_layout screen"
+      },
+      {
+        "name": "Home",
+        "route": "app/(tabs)/index.tsx",
+        "icon": "home",
+        "description": "Index screen"
+      },
+      {
+        "name": "Explore",
+        "route": "app/(tabs)/explore.tsx",
+        "icon": "compass",
+        "description": "Explore screen"
+      }
+    ],
+    "modals": [
+      {
+        "name": "DetailsModal",
+        "route": "app/modal.tsx",
+        "presentation": "modal"
+      }
+    ],
+    "state_management": {
+      "store": "React Context (AppContext) + useReducer",
+      "persistence": "AsyncStorage"
+    }
+  },
+  "simulator_schema": {
+    "appName": "Student Planner",
+    "activeScreen": "Home",
+    "screens": {
+      "Home": {
+        "title": "Student Planner",
+        "metric": {
+          "title": "Assignments Due Today",
+          "value": "2",
+          "sub": "Stay on top of your workload"
+        },
+        "inputPlaceholder": "Add new assignment\u2026",
+        "sectionTitle": "Active Student Planner Feed",
+        "items": [
+          {
+            "id": "1",
+            "title": "Active Student Planner entry",
+            "subtitle": "Real-time state item",
+            "emoji": "\u26a1",
+            "done": false
+          },
+          {
+            "id": "2",
+            "title": "Completed entry",
+            "subtitle": "Logged successfully",
+            "emoji": "\u2713",
+            "done": true
+          }
+        ]
+      },
+      "Explore": {
+        "title": "Explore \u2014 Student Planner",
+        "metric": {
+          "title": "Discovery",
+          "value": "12",
+          "sub": "Total items tracked"
+        },
+        "inputPlaceholder": "Search or filter items...",
+        "sectionTitle": "Directory & Insights",
+        "items": [
+          {
+            "id": "3",
+            "title": "Historical log entry",
+            "subtitle": "Archived data",
+            "emoji": "\ud83d\udcca",
+            "done": false
+          }
+        ]
+      }
+    }
+  },
+  "timestamp": 1791217710.5376225
+}

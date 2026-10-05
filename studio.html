@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lunor.AI — Autonomous Mobile App Development Agent</title>
+  <link rel="icon" type="image/x-icon" href="/static/lunor_online/lunor.online/logo.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/studio.css" />
+</head>
+<body>
+  <!-- Top Navigation & Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand">
+        <div class="logo-mark">L</div>
+        <div class="brand-text">
+          <span class="brand-name">Lunor<span class="accent-dot">.AI</span></span>
+          <span class="brand-badge">Agentic Studio</span>
+        </div>
+      </div>
+      <div class="paradigm-pill">
+        <span class="pulse-indicator"></span>
+        <span>Autonomous Agent (Antigravity · Codex · Claude Code)</span>
+      </div>
+    </div>
+
+    <!-- Central Prompt Bar (Clean, Autonomous Agent Input) -->
+    <div class="header-center">
+      <div class="prompt-bar">
+        <span class="search-icon">⚡</span>
+        <input 
+          type="text" 
+          id="prompt-input" 
+          placeholder="Ask the Agent to build ANY app (e.g. 'Gym workout tracker with rest timers, sets, and progress charts')..." 
+          autocomplete="off"
+        />
+        <button id="btn-run-agent" class="btn-primary" title="Synthesize complete bespoke app on disk">
+          <span class="btn-text">Generate App</span>
+          <span class="shortcut">↵</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-gdrive-config" class="btn-secondary" title="Configure Google Drive Cloud Storage & Sync">
+        <span class="gdrive-icon">☁️</span>
+        <span id="gdrive-status-label">Google Drive</span>
+      </button>
+      <button id="btn-config-key" class="btn-secondary" title="Configure Groq API Key (GPT-OSS 120B)">
+        <span>⚡</span>
+        <span id="key-label">Groq Key</span>
+      </button>
+      <button id="btn-run-instructions" class="btn-secondary" title="View terminal instructions to run this app on your phone">
+        <span>▶️</span>
+        <span>Run on Device</span>
+      </button>
+      <button id="btn-open-folder" class="btn-secondary" title="Open generated_app folder on your computer">
+        <span>📂</span>
+        <span>Open Folder</span>
+      </button>
+      <button id="btn-export-zip" class="btn-secondary" title="Export runnable Expo ZIP project">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Export ZIP</span>
+      </button>
+      <div class="model-badge">
+        <span class="mcp-dot"></span>
+        <span>Groq 120B</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 6-Stage Cognitive Navigator -->
+  <nav class="cognitive-stage-bar">
+    <button class="stage-step" data-stage="prompt">
+      <span class="step-num">1</span>
+      <span class="step-title">Prompt</span>
+    </button>
+    <div class="stage-connector"></div>
+
+    <button class="stage-step" data-stage="understand">
+      <span class="step-num">2</span>
+      <span class="step-title">Understand</span>
+      <span class="step-persona">Product Manager</span>
+    </button>
+    <div class="stage-connector"></div>
+
+    <button class="stage-step" data-stage="plan">
+      <span class="step-num">3</span>
+      <span class="step-title">Plan</span>
+      <span class="step-persona">Architect</span>
+    </button>
+    <div class="stage-connector"></div>
+
+    <button class="stage-step active" data-stage="build">
+      <span class="step-num">4</span>
+      <span class="step-title">Build</span>
+      <span class="step-persona">Builder Agent</span>
+    </button>
+    <div class="stage-connector"></div>
+
+    <button class="stage-step" data-stage="explain">
+      <span class="step-num">5</span>
+      <span class="step-title">Explain</span>
+      <span class="step-persona">Tutor</span>
+    </button>
+    <div class="stage-connector"></div>
+
+    <button class="stage-step" data-stage="learn">
+      <span class="step-num">6</span>
+      <span class="step-title">Learn</span>
+      <span class="step-persona">Quiz & Mastery</span>
+    </button>
+  </nav>
+
+  <!-- Main Workspace: Three-Pane IDE -->
+  <main class="ide-container">
+    <!-- LEFT PANE: Real File Tree & Agent Output -->
+    <section class="pane pane-left" id="pane-context">
+      <div class="pane-header">
+        <div class="pane-tabs">
+          <button class="tab-btn active" data-left-tab="file-explorer">📁 Files <span class="tab-pill" id="file-count-badge">0</span></button>
+          <button class="tab-btn" data-left-tab="agent-terminal">⚡ Agent Terminal</button>
+          <button class="tab-btn" data-left-tab="stage-view">🎓 Architecture</button>
+        </div>
+        <span class="live-pill" id="live-indicator">Ready</span>
+      </div>
+
+      <div class="pane-body">
+        <!-- 1. Real File Tree Explorer (Saved to Google Drive & Disk) -->
+        <div class="left-tab-content active" id="view-file-explorer">
+          <div class="file-tree-container">
+            <div class="file-tree-header">
+              <div class="workspace-title-group">
+                <span class="workspace-label">📁 Workspace</span>
+                <span class="workspace-cloud-badge" id="workspace-cloud-pill">☁️ Drive Ready</span>
+              </div>
+              <div class="workspace-actions">
+                <button id="btn-gdrive-sync-now" class="btn-micro" title="Upload all files to Google Drive">☁️ Sync</button>
+                <button id="btn-tree-refresh" class="btn-micro" title="Refresh files from workspace">↻</button>
+                <button id="btn-tree-open" class="btn-micro" title="Open in Local Explorer">Local ↗</button>
+              </div>
+            </div>
+            <div class="disk-path-card" id="drive-info-banner">
+              <div class="disk-path-label" id="workspace-storage-type">Storage Location:</div>
+              <div class="disk-path-text" id="workspace-disk-path">Google Drive: My Drive > LunorApps</div>
+            </div>
+            <div class="file-tree-list" id="file-tree-list">
+              <!-- Populated dynamically with actual files from workspace -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Agent Terminal Output (Claude Code / Antigravity style) -->
+        <div class="left-tab-content" id="view-agent-terminal">
+          <div class="xai-console-header">
+            <span class="console-title">Autonomous Execution Trace</span>
+            <button id="btn-clear-xai" class="btn-micro">Clear</button>
+          </div>
+          <div class="xai-terminal" id="xai-terminal-logs">
+            <!-- Streaming log cards injected here -->
+          </div>
+        </div>
+
+        <!-- 3. Architecture & Pedagogy -->
+        <div class="left-tab-content" id="view-stage-view">
+          <div id="stage-details-container">
+            <!-- Populated dynamically based on active cognitive stage -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANE: Code Studio -->
+    <section class="pane pane-center" id="pane-code">
+      <div class="pane-header">
+        <div class="file-tabs-bar" id="file-tabs-bar">
+          <!-- Dynamically generated file tabs -->
+        </div>
+        <div class="code-actions">
+          <button id="btn-save-disk" class="btn-primary" style="padding: 4px 10px; font-size: 11px;" title="Save edits to disk & cloud (Ctrl+S)">
+            <span>💾 Save</span>
+          </button>
+          <button id="btn-sync-file-drive" class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" title="Push current file to Google Drive">
+            <span>☁️ Push Drive</span>
+          </button>
+          <button id="btn-copy-path" class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" title="Copy file path">
+            <span>📎 Copy Path</span>
+          </button>
+          <button id="btn-apply-code" class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" title="Apply to live phone simulator">
+            <span>⚡ Apply</span>
+          </button>
+          <button id="btn-copy-code" class="btn-micro" title="Copy file content">
+            <span>📋 Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="code-editor-wrapper">
+        <div class="editor-gutter" id="editor-gutter"></div>
+        <pre class="editor-code" id="editor-code-display" contenteditable="true" spellcheck="false"><code id="code-content">// Initializing autonomous code studio...</code></pre>
+      </div>
+
+      <div class="code-footer">
+        <div class="file-meta">
+          <span class="meta-item" id="active-file-path">app/(tabs)/index.tsx</span>
+          <span class="meta-item" id="active-file-lines">0 lines</span>
+          <span class="meta-item" id="active-storage-status" style="color:#10B981;">Synced to Google Drive ✓</span>
+        </div>
+        <div class="linter-status" id="linter-badge">
+          <span class="badge-dot green"></span>
+          <span>Expo SDK 55 · Run: cd generated_app && npx expo start</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: Interactive Virtual Mobile Simulator -->
+    <section class="pane pane-right" id="pane-simulator">
+      <div class="pane-header">
+        <div class="sim-controls">
+          <span class="sim-title">Virtual DOM Simulator</span>
+          <div class="device-toggle">
+            <button class="toggle-btn active" data-device="ios">iPhone 15</button>
+            <button class="toggle-btn" data-device="android">Pixel 8</button>
+          </div>
+        </div>
+        <div class="sim-actions">
+          <button id="btn-reset-sim" class="btn-micro" title="Reset simulator state">Reset</button>
+          <button id="btn-theme-toggle" class="btn-micro" title="Toggle app dark/light mode">Theme</button>
+        </div>
+      </div>
+
+      <div class="simulator-viewport">
+        <!-- Phone Device Frame -->
+        <div class="phone-frame ios" id="phone-device">
+          <!-- Dynamic Island / Punch Hole -->
+          <div class="phone-cutout" id="phone-cutout">
+            <div class="dynamic-island">
+              <span class="sensor-cam"></span>
+            </div>
+          </div>
+
+          <!-- Phone Status Bar -->
+          <div class="phone-status-bar">
+            <span class="status-time" id="sim-clock">9:41</span>
+            <div class="status-icons">
+              <span class="icon-wifi">📶</span>
+              <span class="icon-battery">🔋</span>
+            </div>
+          </div>
+
+          <!-- Scrollable Native App Screen Content -->
+          <div class="phone-screen" id="sim-screen-container">
+            <!-- Injected by Virtual DOM Renderer in studio.js -->
+          </div>
+
+          <!-- Bottom Tab Navigation Bar -->
+          <div class="phone-tab-bar" id="sim-tab-bar">
+            <!-- Dynamically populated with active tab highlights -->
+          </div>
+
+          <!-- Home Indicator Swipe Bar -->
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Run on Device Modal -->
+  <div id="run-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>▶️ Run on Your Phone (Expo SDK 55)</h3>
+        <button id="btn-close-modal" class="btn-micro" style="padding:4px 8px; font-size:12px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:#D1D5DB; line-height:1.5;">
+          All code files are written directly to your computer's disk at:
+        </p>
+        <div class="code-terminal-box">c:\Users\salin\lunorsoft\generated_app</div>
+
+        <p style="margin-top:14px; font-size:13px; color:#D1D5DB; line-height:1.5;">
+          Open your terminal (PowerShell, Command Prompt, or VS Code terminal) and run:
+        </p>
+        <div class="code-terminal-box">cd generated_app
+npm install
+npx expo start</div>
+
+        <p style="margin-top:14px; font-size:12px; color:#9CA3AF; line-height:1.5;">
+          📲 <strong>Test on Physical Phone:</strong> Install the free <strong>Expo Go</strong> app on your iPhone (App Store) or Android (Google Play Store), then scan the terminal QR code to run your newly synthesized app live!
+        </p>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+          <button id="btn-open-folder-modal" class="btn-primary" style="padding:7px 14px; font-size:12px;">
+            <span>📂 Open in Explorer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Drive Cloud Storage Modal -->
+  <div id="gdrive-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">☁️</span>
+          <h3>Google Drive Cloud Repository</h3>
+        </div>
+        <button id="btn-close-gdrive-modal" class="btn-micro" style="padding:4px 8px; font-size:12px;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="gdrive-status-card" id="gdrive-status-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:700; color:#E5E7EB;">Connection Status</span>
+            <span class="badge-status disconnected" id="gdrive-status-badge">Not Connected</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#9CA3AF; margin-top:6px;">
+            <span>Account:</span>
+            <span style="color:#F3F4F6; font-weight:600;" id="gdrive-user-email">None</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#9CA3AF; margin-top:4px;">
+            <span>Drive Folder:</span>
+            <span style="color:#60A5FA; font-weight:600;" id="gdrive-folder-name">My Drive &gt; LunorApps</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#9CA3AF; margin-top:4px;">
+            <span>Synced Files:</span>
+            <span style="color:#34D399; font-weight:600;" id="gdrive-synced-count">0 files</span>
+          </div>
+          <div style="margin-top:8px; display:none;" id="gdrive-link-container">
+            <a href="#" target="_blank" class="gdrive-link" id="gdrive-open-folder-link">📂 Open LunorApps in Google Drive ↗</a>
+          </div>
+        </div>
+
+        <div class="modal-tabs" style="margin-top:16px;">
+          <button class="modal-tab-btn active" id="btn-tab-quick" type="button">⚡ 1-Click Cloud Drive (Recommended)</button>
+          <button class="modal-tab-btn" id="btn-tab-token" type="button">🔑 Google OAuth Token</button>
+        </div>
+
+        <!-- 1-Click Cloud Drive Form -->
+        <div id="gdrive-view-quick">
+          <p class="form-hint" style="margin-bottom:12px; color:#D1D5DB; font-size:12px;">
+            Enables instant cloud synchronization. Enter your Google email address and all generated mobile app files will automatically sync directly to your personal Google Drive cloud workspace.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Google Email Address:</label>
+            <input type="email" id="gdrive-quick-email" class="form-input" placeholder="e.g. yourname@gmail.com" />
+          </div>
+          <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+            <button id="btn-activate-quick-gdrive" class="btn-primary" style="padding:8px 16px; font-size:12px;">
+              <span>⚡ Activate Cloud Drive Sync</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Token Form -->
+        <div id="gdrive-view-token" style="display:none;">
+          <p class="form-hint" style="margin-bottom:10px; color:#9CA3AF; font-size:11px;">
+            Provide an authorized Google OAuth Bearer Token (with <code>drive.file</code> or <code>drive</code> scope).
+          </p>
+          <div class="form-group">
+            <label class="form-label">Google Account Email:</label>
+            <input type="email" id="gdrive-token-email" class="form-input" placeholder="e.g. user@gmail.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Google OAuth Access Token:</label>
+            <input type="password" id="gdrive-access-token" class="form-input" placeholder="ya29.a0AfH6SM..." autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Root Folder Name:</label>
+            <input type="text" id="gdrive-folder-input" class="form-input" value="LunorApps" />
+          </div>
+          <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+            <button id="btn-save-gdrive-token" class="btn-primary" style="padding:8px 16px; font-size:12px;">
+              <span>Connect Token &amp; Verify</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
+          <button id="btn-disconnect-gdrive" class="btn-secondary" style="font-size:11px; color:#F87171; border-color:rgba(239,68,68,0.3); display:none;">
+            <span>Disconnect</span>
+          </button>
+          <button id="btn-sync-all-gdrive" class="btn-primary" style="padding:7px 14px; font-size:12px; margin-left:auto;">
+            <span>☁️ Sync All Project Files Now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Groq API Key Modal -->
+  <div id="groq-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">⚡</span>
+          <h3>Groq API Key (GPT-OSS 120B)</h3>
+        </div>
+        <button id="btn-close-groq-modal" class="btn-micro" style="padding:4px 8px; font-size:12px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:12px; color:#D1D5DB; line-height:1.5;">
+          Enter your Groq API key to power real-time code synthesis with <strong>openai/gpt-oss-120b</strong>. The key is securely sent to your local orchestrator.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Groq API Key:</label>
+          <input type="password" id="groq-api-key-input" class="form-input" placeholder="gsk_..." />
+        </div>
+        <p class="form-hint" style="margin-top:6px;">
+          Don't have a key? Get one for free at <a href="https://console.groq.com/keys" target="_blank" style="color:#60A5FA;">console.groq.com</a>.
+        </p>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+          <button id="btn-save-groq-key" class="btn-primary" style="padding:8px 16px; font-size:12px;">
+            <span>Save &amp; Activate</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/studio.js"></script>
+</body>
+</html>
