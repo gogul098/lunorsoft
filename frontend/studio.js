@@ -9,12 +9,8 @@
  * 6. 1-Click Expo Project Exporter
  */
 
-// Base API URL for decoupled hosting (e.g. Frontend on Vercel/Netlify, Backend on Render/Railway)
-let apiBaseUrl = (window.LUNOR_API_BASE || localStorage.getItem('LUNOR_API_BASE') || '').replace(/\/+$/, '');
-
 function getApiUrl(endpoint) {
-  if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-  return apiBaseUrl ? `${apiBaseUrl}${endpoint}` : endpoint;
+  return endpoint;
 }
 
 // Global State
@@ -25,7 +21,6 @@ const state = {
   deviceMode: 'ios',
   theme: 'dark',
   isStreaming: false,
-  apiBaseUrl: apiBaseUrl,
   groqApiKey: localStorage.getItem('LUNOR_GROQ_KEY') || '',
   workspaceDir: 'c:\\Users\\salin\\lunorsoft\\generated_app',
 
@@ -54,30 +49,10 @@ const state = {
   challenges: null
 };
 
-// Automatically detect Vercel environment variable (BACKEND_URL)
-async function detectVercelEnvironment() {
-  if (!state.apiBaseUrl) {
-    try {
-      const res = await fetch('/api/config');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.backend_url) {
-          state.apiBaseUrl = data.backend_url.replace(/\/+$/, '');
-          apiBaseUrl = state.apiBaseUrl;
-        }
-      }
-    } catch (e) {
-      // Running unified locally or offline
-    }
-  }
-}
-
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   startClock();
-  await detectVercelEnvironment();
-  updateApiButtonUI();
   await checkBackendGroqStatus();
   updateKeyButtonUI();
   await checkGoogleDriveStatus();
@@ -503,60 +478,6 @@ async function saveGroqKey() {
   closeGroqModal();
 }
 
-// --- API Endpoint Management (for Decoupled Hosting) ---
-function openApiModal() {
-  const modal = document.getElementById('api-modal');
-  const input = document.getElementById('api-url-input');
-  if (input) input.value = state.apiBaseUrl || '';
-  if (modal) modal.style.display = 'flex';
-}
-
-function closeApiModal() {
-  const modal = document.getElementById('api-modal');
-  if (modal) modal.style.display = 'none';
-}
-
-async function saveApiUrl() {
-  const input = document.getElementById('api-url-input');
-  const url = input ? input.value.trim().replace(/\/+$/, '') : '';
-  state.apiBaseUrl = url;
-  apiBaseUrl = url;
-  if (url) {
-    localStorage.setItem('LUNOR_API_BASE', url);
-    showToast(`🌐 Connected to Backend: ${url}`);
-  } else {
-    localStorage.removeItem('LUNOR_API_BASE');
-    showToast('🌐 Using Same-Origin / Local Backend');
-  }
-  updateApiButtonUI();
-  closeApiModal();
-  await loadWorkspaceFromDisk();
-  await checkGoogleDriveStatus();
-  await checkBackendGroqStatus();
-}
-
-function updateApiButtonUI() {
-  const label = document.getElementById('api-endpoint-label');
-  const btn = document.getElementById('btn-api-endpoint');
-  if (label && btn) {
-    if (state.apiBaseUrl) {
-      try {
-        const parsed = new URL(state.apiBaseUrl);
-        label.textContent = `API: ${parsed.hostname}`;
-      } catch (e) {
-        label.textContent = 'API: Remote';
-      }
-      btn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-      btn.style.color = '#60A5FA';
-    } else {
-      label.textContent = 'API: Local';
-      btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-      btn.style.color = '#D1D5DB';
-    }
-  }
-}
-
-
 // --- Event Listeners Setup ---
 function setupEventListeners() {
   // Run Pipeline button
@@ -747,27 +668,6 @@ function setupEventListeners() {
       showToast(`Simulator theme: ${state.theme}`);
     });
   }
-
-  // API Endpoint Modal (for decoupled hosting)
-  const btnApiEndpoint = document.getElementById('btn-api-endpoint');
-  const btnCloseApiModal = document.getElementById('btn-close-api-modal');
-  const apiModal = document.getElementById('api-modal');
-  const btnSaveApiUrl = document.getElementById('btn-save-api-url');
-  const btnClearApiUrl = document.getElementById('btn-clear-api-url');
-
-  if (btnApiEndpoint) btnApiEndpoint.addEventListener('click', openApiModal);
-  if (btnCloseApiModal) btnCloseApiModal.addEventListener('click', closeApiModal);
-  if (apiModal) {
-    apiModal.addEventListener('click', (e) => {
-      if (e.target === apiModal) closeApiModal();
-    });
-  }
-  if (btnSaveApiUrl) btnSaveApiUrl.addEventListener('click', saveApiUrl);
-  if (btnClearApiUrl) btnClearApiUrl.addEventListener('click', () => {
-    const input = document.getElementById('api-url-input');
-    if (input) input.value = '';
-    saveApiUrl();
-  });
 
   // Keyboard shortcut Ctrl+S or Cmd+S to save directly to disk
   window.addEventListener('keydown', (e) => {

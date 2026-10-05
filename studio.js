@@ -9,6 +9,10 @@
  * 6. 1-Click Expo Project Exporter
  */
 
+function getApiUrl(endpoint) {
+  return endpoint;
+}
+
 // Global State
 const state = {
   currentStage: 'build',
@@ -57,10 +61,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadWorkspaceFromDisk();
 });
 
+
+
 // --- Workspace Disk Synchronization ---
 async function loadWorkspaceFromDisk() {
   try {
-    const res = await fetch('/api/workspace/files');
+    const res = await fetch(getApiUrl('/api/workspace/files'));
     if (res.ok) {
       const data = await res.json();
       state.workspaceDir = data.workspace_dir || state.workspaceDir;
@@ -74,7 +80,7 @@ async function loadWorkspaceFromDisk() {
         const loadedFiles = [];
         for (const df of data.files) {
           try {
-            const fRes = await fetch(`/api/workspace/file?path=${encodeURIComponent(df.path)}`);
+            const fRes = await fetch(getApiUrl(`/api/workspace/file?path=${encodeURIComponent(df.path)}`));
             if (fRes.ok) {
               const fData = await fRes.json();
               loadedFiles.push({
@@ -104,7 +110,7 @@ async function loadWorkspaceFromDisk() {
 
     // Also hydrate manifest (spec, simulator schema, lesson) from disk
     try {
-      const mRes = await fetch('/api/workspace/manifest');
+      const mRes = await fetch(getApiUrl('/api/workspace/manifest'));
       if (mRes.ok) {
         const manifest = await mRes.json();
         if (manifest.spec) state.spec = manifest.spec;
@@ -131,7 +137,7 @@ async function saveFileToDisk() {
   if (!currentFile) return;
 
   try {
-    const res = await fetch('/api/workspace/file', {
+    const res = await fetch(getApiUrl('/api/workspace/file'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -164,7 +170,7 @@ async function saveFileToDisk() {
 
 async function openWorkspaceFolder() {
   try {
-    const res = await fetch('/api/workspace/open-folder', { method: 'POST' });
+    const res = await fetch(getApiUrl('/api/workspace/open-folder'), { method: 'POST' });
     if (res.ok) {
       showToast('📂 Opened workspace folder in Windows Explorer!');
     } else {
@@ -189,7 +195,7 @@ function copyDiskPath() {
 // --- Google Drive Integration & Cloud State ---
 async function checkGoogleDriveStatus() {
   try {
-    const res = await fetch('/api/gdrive/status');
+    const res = await fetch(getApiUrl('/api/gdrive/status'));
     if (!res.ok) return;
     const data = await res.json();
     state.gdriveStatus = data;
@@ -303,7 +309,7 @@ async function activateQuickGoogleDrive() {
 
   showToast('Connecting Google Drive Cloud Workspace...');
   try {
-    const res = await fetch('/api/gdrive/config', {
+    const res = await fetch(getApiUrl('/api/gdrive/config'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -340,7 +346,7 @@ async function saveGoogleDriveToken() {
 
   showToast('Verifying Google OAuth token...');
   try {
-    const res = await fetch('/api/gdrive/config', {
+    const res = await fetch(getApiUrl('/api/gdrive/config'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -364,7 +370,7 @@ async function saveGoogleDriveToken() {
 
 async function disconnectGoogleDrive() {
   try {
-    const res = await fetch('/api/gdrive/disconnect', { method: 'POST' });
+    const res = await fetch(getApiUrl('/api/gdrive/disconnect'), { method: 'POST' });
     if (res.ok) {
       showToast('Google Drive disconnected');
       await checkGoogleDriveStatus();
@@ -379,7 +385,7 @@ async function syncAllToGoogleDrive() {
   showToast('☁️ Syncing workspace to Google Drive...');
   try {
     const appName = state.spec ? state.spec.app_name : 'LunorApp';
-    const res = await fetch('/api/gdrive/sync', {
+    const res = await fetch(getApiUrl('/api/gdrive/sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ app_name: appName })
@@ -404,7 +410,7 @@ async function syncActiveFileToGoogleDrive() {
 
   saveCurrentEditorContent();
   try {
-    const res = await fetch('/api/workspace/file', {
+    const res = await fetch(getApiUrl('/api/workspace/file'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -459,7 +465,7 @@ async function saveGroqKey() {
   }
 
   try {
-    await fetch('/api/config/groq', {
+    await fetch(getApiUrl('/api/config/groq'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ groq_api_key: key })
@@ -675,7 +681,7 @@ function setupEventListeners() {
 // --- API Key Management ---
 async function checkBackendGroqStatus() {
   try {
-    const res = await fetch('/api/config/groq');
+    const res = await fetch(getApiUrl('/api/config/groq'));
     if (res.ok) {
       const data = await res.json();
       if (data.groq_configured) {
@@ -724,7 +730,7 @@ async function runAgentPipeline() {
   `;
 
   try {
-    let url = `/api/agent/stream?prompt=${encodeURIComponent(prompt)}`;
+    let url = getApiUrl(`/api/agent/stream?prompt=${encodeURIComponent(prompt)}`);
     if (state.groqApiKey && state.groqApiKey !== 'configured-on-server') {
       url += `&groq_api_key=${encodeURIComponent(state.groqApiKey)}`;
     }
@@ -757,7 +763,7 @@ async function runAgentPipeline() {
     }
   } catch (err) {
     console.warn('SSE stream fallback to POST /api/agent/run:', err);
-    const directRes = await fetch('/api/agent/run', {
+    const directRes = await fetch(getApiUrl('/api/agent/run'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1478,7 +1484,7 @@ function escapeHTML(str) {
 async function exportExpoZip() {
   const appName = state.spec ? state.spec.app_name : 'LunorMobileApp';
   try {
-    const res = await fetch('/api/export', {
+    const res = await fetch(getApiUrl('/api/export'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

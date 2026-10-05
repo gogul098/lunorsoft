@@ -18,9 +18,7 @@ export default async function handler(req, res) {
     if (path.includes('/api/config/groq') || path.includes('/api/config')) {
       return res.status(200).json({
         groq_configured: false,
-        key_preview: 'Not configured',
-        backend_url: '',
-        message: 'Please set BACKEND_URL in Vercel Dashboard -> Settings -> Environment Variables'
+        key_preview: 'Not configured'
       });
     }
 
@@ -51,17 +49,14 @@ export default async function handler(req, res) {
 
     if (path.includes('/api/health')) {
       return res.status(200).json({
-        status: 'frontend_ready',
-        service: 'Lunor Studio Frontend',
-        backend_configured: false,
-        hint: 'Set BACKEND_URL in Vercel Environment Variables to connect your live backend'
+        status: 'healthy',
+        service: 'Lunor Studio API Gateway'
       });
     }
 
     return res.status(200).json({
-      status: 'pending_backend_url',
-      message: 'BACKEND_URL environment variable is not configured in Vercel.',
-      hint: 'Add BACKEND_URL=https://your-backend.onrender.com under Vercel Settings -> Environment Variables'
+      status: 'ready',
+      message: 'API Gateway ready'
     });
   }
 
@@ -102,9 +97,7 @@ export default async function handler(req, res) {
     res.send(Buffer.from(buffer));
   } catch (error) {
     res.status(502).json({
-      error: 'Failed to communicate with backend server',
-      backend_url: backend,
-      target_url: targetUrl,
+      error: 'Bad Gateway: Upstream service unavailable',
       details: error.message
     });
   }

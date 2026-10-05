@@ -22,7 +22,7 @@ Modern, decoupled static web client for Lunor.AI — the autonomous mobile app d
 # From within the frontend/ directory:
 python -m http.server 3000
 ```
-Then visit `http://localhost:3000`. Click the **🌐 API: Local** button in the top right to configure your backend URL (e.g., `http://localhost:8000`).
+Then visit `http://localhost:3000`.
 
 ### Serving with Node.js
 ```bash
@@ -36,8 +36,7 @@ npx serve .
 ### Option 1: Vercel
 1. Install Vercel CLI (`npm i -g vercel`) or deploy via [vercel.com](https://vercel.com).
 2. Set Root Directory to `frontend/` (or run `vercel` inside `frontend/`).
-3. Vercel automatically reads `vercel.json`.
-4. Once deployed, open your live Vercel URL and set your backend URL via the **🌐 API** button or set `window.LUNOR_API_BASE = "https://your-backend.onrender.com"`!
+3. Vercel automatically reads `vercel.json` and proxies `/api/*` requests server-side.
 
 ### Option 2: Netlify
 1. Connect your repository to [Netlify](https://netlify.com).
@@ -65,8 +64,7 @@ When deploying on Vercel, you connect to your backend using a standard **Environ
 4. Click **Save** and redeploy.
 
 ### How it works:
-- [`frontend/vercel.json`](vercel.json) uses the `${BACKEND_URL}` rewrite rule to transparently forward all `/api/*` calls directly to your backend.
-- [`frontend/api/[...path].js`](api/[...path].js) provides an automatic serverless proxy fallback.
-- [`frontend/api/config.js`](api/config.js) dynamically informs the frontend client of the configured backend.
-- No manual browser configuration is required!
+- [`frontend/vercel.json`](vercel.json) routes all `/api/*` requests through the serverless proxy.
+- [`frontend/api/[...path].js`](api/[...path].js) provides an automatic serverless proxy that forwards requests server-side without exposing your backend endpoint to the browser.
+- No manual browser configuration or URL exposure is required!
 
