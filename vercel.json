@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/assets/(.*)",
+      "destination": "/frontend/assets/$1"
+    },
+    {
+      "source": "/studio.css",
+      "destination": "/frontend/studio.css"
+    },
+    {
+      "source": "/studio.js",
+      "destination": "/frontend/studio.js"
+    },
+    {
+      "source": "/studio",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/[...path]"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    }
+  ]
+}

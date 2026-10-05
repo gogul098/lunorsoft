@@ -4,13 +4,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/api/config",
-      "destination": "/api/config.js"
-    },
-    {
       "source": "/api/(.*)",
-      "destination": "${BACKEND_URL}/api/$1",
-      "env": ["BACKEND_URL"]
+      "destination": "/api/[...path]"
     },
     {
       "source": "/studio",
